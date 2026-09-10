@@ -44,6 +44,29 @@ abstract readonly class AbstractService
     }
 
     /**
+     * Run operation inside a database transaction (commit on success, roll back and rethrow on failure)
+     *
+     * @template T
+     * @param callable(): T $operation
+     * @return T
+     */
+    protected function transaction(callable $operation): mixed
+    {
+        $transaction = $this->getDb()->beginTransaction();
+
+        try {
+            $result = $operation();
+            $transaction->commit();
+
+            return $result;
+        } catch (Throwable $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+    }
+
+    /**
      * Sanitize an exception backtrace by stripping potentially sensitive frame
      * fields (`args`, `object`, ...). Only structural metadata is kept so the
      * trace remains useful for debugging without ever leaking private keys,

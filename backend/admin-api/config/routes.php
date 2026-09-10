@@ -15,6 +15,7 @@ use AdminApi\Middleware\MustNotProduction;
 use AdminApi\Service\AdminAccess;
 use Yiisoft\Router\Group;
 use Yiisoft\Router\Route;
+use Yiisoft\Yii\RateLimiter\LimitRequestsMiddleware;
 
 const ROUTE_ID = '{id:[\w\-]+}';
 
@@ -22,7 +23,10 @@ return [
     Group::create('')->middleware(Authenticate::class)
         ->routes(
             Group::create('/auth')->routes(
-                Route::post('/login')->middleware(MustNotAuthenticated::class)->action([AuthController::class, 'login']),
+                // LimitRequestsMiddleware is outermost: brute force is counted before the user is looked up.
+                Route::post('/login')
+                    ->middleware(LimitRequestsMiddleware::class, MustNotAuthenticated::class)
+                    ->action([AuthController::class, 'login']),
                 Route::post('/logout')->middleware(MustAuthenticated::class)->action([AuthController::class, 'logout']),
                 Route::post('/whoami')->middleware(MustAuthenticated::class)->action([AuthController::class, 'whoami']),
             ),

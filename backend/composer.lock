@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b1be9933a8fbde02bcce7698f94fc528",
+    "content-hash": "e21fa102a78f06a60a2759353b47cb93",
     "packages": [
         {
             "name": "alexkart/curl-builder",
@@ -4248,6 +4248,84 @@
                 }
             ],
             "time": "2025-12-20T05:12:53+00:00"
+        },
+        {
+            "name": "yiisoft/rate-limiter",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiisoft/rate-limiter.git",
+                "reference": "7e2735c4206acf0b12d68837f045ef9d20f0bd17"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiisoft/rate-limiter/zipball/7e2735c4206acf0b12d68837f045ef9d20f0bd17",
+                "reference": "7e2735c4206acf0b12d68837f045ef9d20f0bd17",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.1|^2.0",
+                "psr/http-message-implementation": "1.0",
+                "psr/http-server-handler": "^1.0",
+                "psr/http-server-middleware": "^1.0",
+                "psr/simple-cache": "^2.0|^3.0",
+                "yiisoft/http": "^1.2"
+            },
+            "require-dev": {
+                "ext-apcu": "*",
+                "maglnet/composer-require-checker": "^4.4",
+                "nyholm/psr7": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "rector/rector": "^0.17.7",
+                "roave/infection-static-analysis-plugin": "^1.16",
+                "spatie/phpunit-watcher": "^1.23",
+                "vimeo/psalm": "^4.30|^5.13",
+                "yiisoft/cache": "^3.0"
+            },
+            "suggest": {
+                "ext-apcu": "To use APCu storage"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Yiisoft\\Yii\\RateLimiter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Yii Rate Limiter Middleware",
+            "homepage": "https://www.yiiframework.com/",
+            "keywords": [
+                "GCRA",
+                "framework",
+                "middleware",
+                "psr-15",
+                "rate limiter",
+                "yii"
+            ],
+            "support": {
+                "chat": "https://t.me/yii3en",
+                "forum": "https://www.yiiframework.com/forum/",
+                "irc": "irc://irc.freenode.net/yii",
+                "issues": "https://github.com/yiisoft/rate-limiter/issues?state=open",
+                "source": "https://github.com/yiisoft/rate-limiter",
+                "wiki": "https://www.yiiframework.com/wiki/"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/yiisoft",
+                    "type": "github"
+                },
+                {
+                    "url": "https://opencollective.com/yiisoft",
+                    "type": "open_collective"
+                }
+            ],
+            "time": "2023-07-26T08:58:15+00:00"
         },
         {
             "name": "yiisoft/request-body-parser",

@@ -1,7 +1,9 @@
 # AGENTS.md — backend
 
 Rules for the backend. Repo-wide shared rules: **[../AGENTS.md](../AGENTS.md)** (read that first).
-No separate skill — this file is the backend's authority.
+Architecture is governed by the bundled skill, which is the authority for the `Common\` module
+and the HTTP layer: **[skills/yii3-backend-architecture/SKILL.md](skills/yii3-backend-architecture/SKILL.md)**
+(+ `references/`). Console and tooling are not in the skill yet — this file remains the authority for those.
 
 ## Overview
 

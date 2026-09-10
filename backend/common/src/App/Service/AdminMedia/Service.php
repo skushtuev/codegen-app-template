@@ -226,8 +226,10 @@ final readonly class Service extends AbstractService
             throw new ValidationException(messageKey: 'admin_media.file_can_not_delete', field: 'id');
         }
 
-        $this->objectStorage->delete($file->getStorageKey()->value());
-        $this->fileRepo->delete($file);
+        $this->transaction(function () use ($file) {
+            $this->fileRepo->delete($file);
+            $this->objectStorage->delete($file->getStorageKey()->value());
+        });
 
         return true;
     }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use AdminApi\Middleware\NotFoundHandler;
+use Common\Shared\Http\LimitPerClientIp;
 use Common\Shared\Exception\ValidationException;
 use Common\Shared\Http\Exception\ForbiddenException;
 use Common\Shared\Http\Exception\InternalException;
@@ -50,6 +51,12 @@ use Yiisoft\Router\RouteCollectionInterface;
 use Yiisoft\Router\RouteCollectorInterface;
 use Yiisoft\Router\UrlMatcherInterface;
 use Yiisoft\Yii\Http\Application;
+use Yiisoft\Yii\RateLimiter\Counter;
+use Yiisoft\Yii\RateLimiter\CounterInterface;
+use Yiisoft\Yii\RateLimiter\LimitRequestsMiddleware;
+use Yiisoft\Yii\RateLimiter\Policy\LimitPolicyInterface;
+use Yiisoft\Yii\RateLimiter\Storage\SimpleCacheStorage;
+use Yiisoft\Yii\RateLimiter\Storage\StorageInterface;
 
 class_alias(Hydrator::class, 'RequestInputHydrator');
 
@@ -103,6 +110,23 @@ return [
         '__construct()' => [
             'hydrator' => Reference::to(ValidatingHydrator::class),
             'throwInputValidationException' => true,
+        ],
+    ],
+
+    // Rate limiting (yiisoft/rate-limiter): GCRA counter kept in the shared Redis cache.
+    StorageInterface::class => SimpleCacheStorage::class,
+    CounterInterface::class => [
+        'class' => Counter::class,
+        '__construct()' => [
+            'limit' => 10,
+            'periodInSeconds' => 120,
+        ],
+    ],
+    LimitPolicyInterface::class => LimitPerClientIp::class,
+    LimitRequestsMiddleware::class => [
+        'class' => LimitRequestsMiddleware::class,
+        '__construct()' => [
+            'limitingPolicy' => Reference::to(LimitPolicyInterface::class),
         ],
     ],
 
