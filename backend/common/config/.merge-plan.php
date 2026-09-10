@@ -148,7 +148,6 @@ return [
             ],
             '/' => [
                 '$di',
-                '../../admin-api/config/di.php',
             ],
         ],
         'params-web' => [
@@ -160,7 +159,6 @@ return [
             ],
             '/' => [
                 '$params',
-                '../../admin-api/config/params.php',
             ],
         ],
         'events-web' => [
@@ -201,6 +199,30 @@ return [
             '/' => [
                 '$params',
                 '../../console/config/params.php',
+            ],
+        ],
+        'params-admin' => [
+            '/' => [
+                '$params-web',
+                '../../admin-api/config/params.php',
+            ],
+        ],
+        'params-internal' => [
+            '/' => [
+                '$params-web',
+                '../../internal-api/config/params.php',
+            ],
+        ],
+        'di-admin' => [
+            '/' => [
+                '$di-web',
+                '../../admin-api/config/di.php',
+            ],
+        ],
+        'di-internal' => [
+            '/' => [
+                '$di-web',
+                '../../internal-api/config/di.php',
             ],
         ],
         'di-delegates' => [

@@ -1,0 +1,26 @@
+{{- /* Language: identity trait first, transient_payload wins if the client sent one.
+       Both are map lookups, so a missing key renders empty instead of failing. */ -}}
+{{- $lang := "en" -}}
+{{- if .Identity.traits.language -}}{{ $lang = .Identity.traits.language }}{{- end -}}
+{{- if .TransientPayload.lang -}}{{ $lang = .TransientPayload.lang }}{{- end -}}
+{{- if eq $lang "ru" -}}
+Здравствуйте{{ if .Identity.traits.name }}, {{ .Identity.traits.name }}{{ end }}!
+
+Подтвердите ваш адрес электронной почты по ссылке:
+
+{{ .VerificationURL }}
+
+Срок действия ссылки — {{ .ExpiresInMinutes }} мин.
+
+Если вы не создавали аккаунт, просто удалите это письмо.
+{{- else -}}
+Hello{{ if .Identity.traits.name }} {{ .Identity.traits.name }}{{ end }},
+
+please confirm your e-mail address by opening this link:
+
+{{ .VerificationURL }}
+
+The link is valid for {{ .ExpiresInMinutes }} minutes.
+
+If you did not create an account, you can ignore this e-mail.
+{{- end -}}

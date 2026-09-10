@@ -1,0 +1,28 @@
+{{- /* transient_payload does NOT reach the recovery template (tested on v26.2.0),
+       so in practice the language here comes from the identity trait. */ -}}
+{{- $lang := "en" -}}
+{{- if .Identity.traits.language -}}{{ $lang = .Identity.traits.language }}{{- end -}}
+{{- if .TransientPayload.lang -}}{{ $lang = .TransientPayload.lang }}{{- end -}}
+{{- if eq $lang "ru" -}}
+Здравствуйте{{ if .Identity.traits.name }}, {{ .Identity.traits.name }}{{ end }}!
+
+Кто-то запросил восстановление доступа к вашему аккаунту.
+Чтобы задать новый пароль, откройте ссылку:
+
+{{ .RecoveryURL }}
+
+Срок действия ссылки — {{ .ExpiresInMinutes }} мин.
+
+Если это были не вы, ничего делать не нужно. Пароль останется прежним.
+{{- else -}}
+Hello{{ if .Identity.traits.name }} {{ .Identity.traits.name }}{{ end }},
+
+someone asked to recover access to your account.
+To set a new password, open this link:
+
+{{ .RecoveryURL }}
+
+The link is valid for {{ .ExpiresInMinutes }} minutes.
+
+If this was not you, no action is needed. Your password stays the same.
+{{- end -}}

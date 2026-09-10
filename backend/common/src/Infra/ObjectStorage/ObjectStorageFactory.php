@@ -23,9 +23,20 @@ final readonly class ObjectStorageFactory
         return match ($provider) {
             self::PROVIDER_NOP => new NopObjectStorage(),
             self::PROVIDER_FILE => new FileObjectStorage(
-                $this->config->mustString('OBJECT_STORAGE_ROOT_PATH'),
+                $this->ensureDirectory($this->config->mustString('OBJECT_STORAGE_ROOT_PATH')),
             ),
             default => throw new ObjectStorageException(sprintf('Object storage provider "%s" is not supported.', $provider)),
         };
+    }
+
+    /** `runtime/` is gitignored, so on a fresh clone this directory does not exist yet. */
+    private function ensureDirectory(string $path): string
+    {
+        // The second is_dir() covers another process creating it between the two calls.
+        if (!is_dir($path) && !mkdir($path, 0o775, true) && !is_dir($path)) {
+            throw new ObjectStorageException(sprintf('Object storage root path "%s" could not be created.', $path));
+        }
+
+        return $path;
     }
 }

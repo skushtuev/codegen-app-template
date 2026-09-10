@@ -25,7 +25,15 @@ const eslintConfig = defineConfig([
       "prettier/prettier": "error",
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "eslint-plugin-custom-rules/**"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "eslint-plugin-custom-rules/**",
+    // Skill assets are templates meant to be copied into a project, not app source.
+    "skills/**",
+  ]),
 ])
 
 export default eslintConfig

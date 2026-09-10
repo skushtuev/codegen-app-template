@@ -47,7 +47,7 @@ services:
       traefik.http.services.app-backend.loadbalancer.server.port: 8080
       traefik.http.middlewares.app-backend-cors.headers.accessControlAllowMethods: GET,OPTIONS,PUT,POST,DELETE,PATCH
       traefik.http.middlewares.app-backend-cors.headers.accessControlAllowHeaders: "Accept,Accept-Language,Content-Language,Content-Type,Origin,X-Requested-With,Authorization"
-      traefik.http.middlewares.app-backend-cors.headers.accessControlAllowOriginList: "http://admin.app.test:3000,http://admin.app.test:3001,http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
+      traefik.http.middlewares.app-backend-cors.headers.accessControlAllowOriginList: "http://admin.app.test:4510,http://localhost:4510,http://127.0.0.1:4510"
       traefik.http.middlewares.app-backend-cors.headers.accessControlAllowCredentials: "true"
       traefik.http.middlewares.app-backend-cors.headers.accessControlMaxAge: 100
       traefik.http.middlewares.app-backend-cors.headers.addVaryHeader: "true"
@@ -78,6 +78,27 @@ services:
     tty: true
     networks:
       - app
+  internal-api:
+    container_name: app-internal-api
+    depends_on:
+      - postgres
+      - redis
+    image: app-backend-internal-api:dev
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.internal-api
+    env_file:
+      - ./backend/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./backend:/app:rw
+      - ./backend/docker/nginx/internal-api.conf:/etc/nginx/http.d/default.conf:ro
+    tty: true
+    # No traefik labels on purpose. This API is reachable only from inside the `app` network,
+    # at http://internal-api:8080. Nothing to expose it by mistake.
+    networks:
+      - app
   postgres:
     image: postgres:17.4-alpine
     container_name: app-db
@@ -89,7 +110,51 @@ services:
       - '7891:5432'
     volumes:
       - pg_data:/var/lib/postgresql/data
+      - ./docker/postgres:/docker-entrypoint-initdb.d:ro
     networks:
+      - app
+  kratos-migrate:
+    image: oryd/kratos:v26.2.0
+    container_name: app-kratos-migrate
+    depends_on:
+      - postgres
+    volumes:
+      - ./kratos:/etc/config/kratos:ro
+    command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
+    restart: on-failure
+    networks:
+      - app
+  kratos:
+    image: oryd/kratos:v26.2.0
+    container_name: app-kratos
+    depends_on:
+      kratos-migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./kratos:/etc/config/kratos:ro
+    command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: traefik
+      traefik.http.routers.app-kratos.rule: Host(`id.app.test`)
+      # Only the public API (4433) is routed. The admin API (4434) stays on the internal
+      # network because it is unauthenticated by design.
+      traefik.http.services.app-kratos.loadbalancer.server.port: 4433
+    networks:
+      - traefik
+      - app
+  mailpit:
+    image: axllent/mailpit:v1.31.1
+    container_name: app-mailpit
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: traefik
+      traefik.http.routers.app-mailpit.rule: Host(`mail.app.test`)
+      traefik.http.services.app-mailpit.loadbalancer.server.port: 8025
+    networks:
+      - traefik
       - app
   redis:
     image: redis:7.2.5-alpine

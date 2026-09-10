@@ -13,7 +13,7 @@ A **Yii3** application (composer `yiisoft/app`, PHP 8.2–8.5) with three PSR-4 
   DTOs, API services. Entry point `admin-api/web/index.php` (yii-runner-http).
 - `Common\` → `common/src` — shared **domain + infrastructure**: `App/` (Active Record models,
   repositories, domain services), `Infra/` (Db, Cache, ObjectStorage, Config), `Shared/` (value
-  objects, exceptions, HTTP helpers, Translator).
+  objects, enums, exceptions, HTTP helpers, Translator).
 - `Console\` → `console/src` — **CLI** commands (`./yii`, yii-runner-console).
 
 More HTTP apps may be added beside `admin-api` later (they reuse `Common\`).
@@ -123,6 +123,9 @@ Output via `ResponseFactory`; errors via exceptions.
 
 - **Value objects** `Common\Shared\ValueObject\*` (`Email`, `Uuid`, `Text`, `NullableText`,
   `NewPassword`): self-validating + immutable; used in model get/set and service inputs.
+- **Enums** `Common\Shared\Enum\*` (`AppLanguage`): app-wide closed value sets, not tied to one
+  model. Enums that only describe one model stay in `Common\App\Models\Enum\*`
+  (e.g. `AdminUserRole`).
 - **Exceptions** — two namespaces:
   - domain `Common\Shared\Exception\*`: `ValidationException` (`messageKey` + `field` + params,
     implements `TranslatableException`), `TranslatableException` (interface), `MustException`,

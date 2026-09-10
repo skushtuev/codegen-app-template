@@ -38,6 +38,7 @@
         "ext-filter": "*",
         "firebase/php-jwt": "^7.0",
         "httpsoft/http-message": "^1.1.6",
+        "ory/kratos-client-php": "^26.2",
         "psr/container": "^2.0.2",
         "psr/http-factory": "^1.1",
         "psr/http-message": "^2.0",
@@ -92,6 +93,7 @@
     "autoload": {
         "psr-4": {
             "AdminApi\\": "admin-api/src",
+            "InternalApi\\": "internal-api/src",
             "Common\\": "common/src",
             "Console\\": "console/src"
         }

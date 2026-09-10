@@ -36,6 +36,8 @@ $runner = new HttpApplicationRunner(
     debug: $config->isDev(),
     checkEvents: $config->isDev(),
     environment: $config->environment()->value,
+    diGroup: 'di-admin',
+    paramsGroup: 'params-admin',
     configDirectory: 'common/config',
     temporaryErrorHandler: new ErrorHandler(
         new Logger(

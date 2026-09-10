@@ -9,9 +9,9 @@ import { AdminUserBanConfirm } from '../ban-confirm'
 import { ChangeRoleModal } from '../change-role'
 import { ChangePasswordModal } from '../change-password'
 import { AdminUserRoleBadge } from '../role-badge'
-import { AdminUserStatusBadge } from '../status-badge'
 import type { AdminUser, AdminUserRoleOption } from '@modules/dashboard/models/admin-users-api.interface'
 import { DashboardPageHeader } from '@modules/dashboard/components/page-header'
+import { DashboardStatusBadge } from '@modules/dashboard/components/status-badge'
 import { DashboardTable } from '@modules/dashboard/components/table'
 import { useAdminUsersListQuery } from '@modules/dashboard/store/admin-users-api'
 import { useMustUser, type IAccount } from '@modules/auth'
@@ -60,7 +60,7 @@ export function AdminUsersList({ page, perPage, roles, loadingRoles, onChangePag
                     },
                     {
                         header: t('Table.status'),
-                        render: (user) => <AdminUserStatusBadge status={user.bannedAt ? 'banned' : 'active'} />,
+                        render: (user) => <DashboardStatusBadge status={user.bannedAt ? 'banned' : 'active'} />,
                     },
                     {
                         header: t('Table.createdAt'),

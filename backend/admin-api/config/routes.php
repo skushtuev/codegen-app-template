@@ -6,6 +6,7 @@ use AdminApi\Controller\Account\Controller as AccountController;
 use AdminApi\Controller\AdminMedia\Controller as AdminMediaController;
 use AdminApi\Controller\AdminUsers\Controller as AdminUsersController;
 use AdminApi\Controller\Auth\Controller as AuthController;
+use AdminApi\Controller\Users\Controller as UsersController;
 use AdminApi\Controller\DocsController;
 use AdminApi\Middleware\Authenticate;
 use AdminApi\Middleware\Can;
@@ -43,6 +44,12 @@ return [
                 Route::post('/role/' . ROUTE_ID)->action([AdminUsersController::class, 'role']),
                 Route::get('/list')->action([AdminUsersController::class, 'list']),
                 Route::get('/roles')->action([AdminUsersController::class, 'roles']),
+            ),
+            Group::create('/users')->middleware(MustAuthenticated::class, Can::withPermission(AdminAccess::USERS))->routes(
+                Route::get('/list')->action([UsersController::class, 'list']),
+                Route::get('/' . ROUTE_ID)->action([UsersController::class, 'view']),
+                Route::post('/ban/' . ROUTE_ID)->action([UsersController::class, 'ban']),
+                Route::post('/unban/' . ROUTE_ID)->action([UsersController::class, 'unban']),
             ),
             Group::create('/admin/media')->middleware(MustAuthenticated::class, Can::withPermission(AdminAccess::ADMIN_MEDIA))->routes(
                 Route::get('/config')->action([AdminMediaController::class, 'config']),

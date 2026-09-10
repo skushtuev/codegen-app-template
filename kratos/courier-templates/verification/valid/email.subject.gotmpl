@@ -1,0 +1,4 @@
+{{- $lang := "en" -}}
+{{- if .Identity.traits.language -}}{{ $lang = .Identity.traits.language }}{{- end -}}
+{{- if .TransientPayload.lang -}}{{ $lang = .TransientPayload.lang }}{{- end -}}
+{{- if eq $lang "ru" -}}Подтвердите ваш адрес электронной почты{{- else -}}Confirm your e-mail address{{- end -}}

@@ -33,7 +33,8 @@ local docs first.**
 | Admin frontend | `admin-frontend/` | Next.js 16, React 19, TypeScript, Mantine v9, Redux Toolkit, next-intl  | [admin-frontend/CLAUDE.md](admin-frontend/CLAUDE.md) |
 | Backend        | `backend/`        | Yii3, PHP 8.2+ (contains `admin-api`; more APIs later)                   | [backend/CLAUDE.md](backend/CLAUDE.md)               |
 
-Local infra lives in [docker-compose.yml](docker-compose.yml): traefik, postgres, redis, rabbitmq.
+Local infra lives in [docker-compose.yml](docker-compose.yml): traefik, postgres, redis, rabbitmq,
+**Ory Kratos** (end-user identity, config in [kratos/](kratos/)) and **Mailpit** (dev mail catcher).
 
 ## Code search — Graphify first
 
@@ -64,6 +65,12 @@ The template ships with a default local domain **`app.test`** and these subdomai
 | `admin.app.test`     | admin frontend (UI)              | `admin-frontend/package.json` (`dev --hostname`), `docker-compose.yml` (CORS allow-origin)         |
 | `admin-api.app.test` | admin API (backend)              | `admin-frontend/.env.example` (`API_URL`), `backend/docker/nginx/admin-api.conf` (`server_name`), `docker-compose.yml` (`Host(...)`) |
 | `cdn.app.test`       | optional uploads CDN (commented) | `backend/.env.example` (`PUBLIC_UPLOADS_BASE_URL`)                                                  |
+| `id.app.test`        | Ory Kratos **public** API        | `kratos/kratos.yml` (`serve.public.base_url`), `docker-compose.yml` (`Host(...)`)                   |
+| `app.app.test`       | end-user frontend (planned)      | `kratos/kratos.yml` (all `ui_url` / return URLs, CORS allow-origin)                                  |
+| `mail.app.test`      | Mailpit UI (dev only)            | `docker-compose.yml` (`Host(...)`)                                                                  |
+
+The Kratos **admin** API (port 4434) is deliberately not routed through traefik — it has no
+authentication of its own. Reach it only from inside the `app` docker network (`http://kratos:4434`).
 
 **Rule — `app.test` is only a placeholder so the template runs out of the box. Before configuring a
 new project from this template, ASK the user which domain they want**, then replace `app.test` with

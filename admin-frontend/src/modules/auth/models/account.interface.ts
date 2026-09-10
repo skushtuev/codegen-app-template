@@ -14,6 +14,7 @@ export interface IAccount {
 export interface IAdminPermissions {
     adminUsers: boolean
     adminMedia: boolean
+    users: boolean
 }
 
 export interface IWhoami {

@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { authApi } from '@modules/auth'
-import { accountApi, adminUsersApi, mediaLibraryApi } from '@modules/dashboard'
+import { accountApi, adminUsersApi, mediaLibraryApi, usersApi } from '@modules/dashboard'
 
 const rootReducer = combineReducers({
     // auth
@@ -8,6 +8,7 @@ const rootReducer = combineReducers({
     [accountApi.reducerPath]: accountApi.reducer,
     [adminUsersApi.reducerPath]: adminUsersApi.reducer,
     [mediaLibraryApi.reducerPath]: mediaLibraryApi.reducer,
+    [usersApi.reducerPath]: usersApi.reducer,
 })
 
 export const setupStore = () =>
@@ -18,7 +19,8 @@ export const setupStore = () =>
                 authApi.middleware,
                 accountApi.middleware,
                 adminUsersApi.middleware,
-                mediaLibraryApi.middleware
+                mediaLibraryApi.middleware,
+                usersApi.middleware
             )
         },
     })

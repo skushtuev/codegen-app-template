@@ -1,19 +1,19 @@
 import { Badge, type MantineColor } from '@mantine/core'
 import { useTranslations } from 'next-intl'
 
-type AdminUserStatus = 'active' | 'banned'
+export type DashboardStatus = 'active' | 'banned'
 
-const statusColors: Record<AdminUserStatus, MantineColor> = {
+const statusColors: Record<DashboardStatus, MantineColor> = {
     active: 'green',
     banned: 'red',
 }
 
 type Props = {
-    status: AdminUserStatus
+    status: DashboardStatus
 }
 
-export function AdminUserStatusBadge({ status }: Props) {
-    const t = useTranslations('Dashboard.AdminUsers.Statuses')
+export function DashboardStatusBadge({ status }: Props) {
+    const t = useTranslations('Dashboard.Statuses')
 
     return (
         <Badge color={statusColors[status]} variant="light">

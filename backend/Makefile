@@ -17,6 +17,11 @@ export COMPOSE_PROJECT_NAME=${STACK_NAME}
 DOCKER_COMPOSE_DEV := docker compose -f ../docker-compose.yml
 DOCKER_COMPOSE_TEST := $(DOCKER_COMPOSE_DEV)
 
+# One-off containers inherit the service labels, so traefik would add them as a second
+# server for admin-api.app.test and half the requests would 502. Opt them out.
+DOCKER_RUN := $(DOCKER_COMPOSE_DEV) run --rm --label traefik.enable=false
+DOCKER_RUN_TEST := $(DOCKER_COMPOSE_TEST) run --rm --label traefik.enable=false
+
 #
 # Development
 #
@@ -57,23 +62,23 @@ endif
 
 ifeq ($(PRIMARY_GOAL),yii)
 yii: ## Execute Yii command.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) ./yii $(CLI_ARGS)
+	$(DOCKER_RUN) $(SERVICE) ./yii $(CLI_ARGS)
 .PHONY: yii
 endif
 
 ifeq ($(PRIMARY_GOAL),composer)
 composer: ## Run Composer.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) composer $(CLI_ARGS)
+	$(DOCKER_RUN) $(SERVICE) composer $(CLI_ARGS)
 endif
 
 ifeq ($(PRIMARY_GOAL),rector)
 rector: ## Run Rector.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) ./vendor/bin/rector $(CLI_ARGS)
+	$(DOCKER_RUN) $(SERVICE) ./vendor/bin/rector $(CLI_ARGS)
 endif
 
 ifeq ($(PRIMARY_GOAL),cs-fix)
 cs-fix: ## Run PHP CS Fixer.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --diff
+	$(DOCKER_RUN) $(SERVICE) ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --diff
 endif
 
 #
@@ -82,32 +87,32 @@ endif
 
 ifeq ($(PRIMARY_GOAL),test)
 test: ## Run tests.
-	$(DOCKER_COMPOSE_TEST) run --rm $(SERVICE) ./vendor/bin/codecept run $(CLI_ARGS)
+	$(DOCKER_RUN_TEST) $(SERVICE) ./vendor/bin/codecept run $(CLI_ARGS)
 endif
 
 ifeq ($(PRIMARY_GOAL),test-coverage)
 test-coverage: ## Run tests with coverage.
-	$(DOCKER_COMPOSE_TEST) run --rm $(SERVICE) ./vendor/bin/codecept run --coverage --coverage-html --disable-coverage-php
+	$(DOCKER_RUN_TEST) $(SERVICE) ./vendor/bin/codecept run --coverage --coverage-html --disable-coverage-php
 endif
 
 ifeq ($(PRIMARY_GOAL),codecept)
 codecept: ## Run Codeception.
-	$(DOCKER_COMPOSE_TEST) run --rm $(SERVICE) ./vendor/bin/codecept $(CLI_ARGS)
+	$(DOCKER_RUN_TEST) $(SERVICE) ./vendor/bin/codecept $(CLI_ARGS)
 endif
 
 ifeq ($(PRIMARY_GOAL),psalm)
 psalm: ## Run Psalm.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) ./vendor/bin/psalm $(CLI_ARGS)
+	$(DOCKER_RUN) $(SERVICE) ./vendor/bin/psalm $(CLI_ARGS)
 endif
 
 ifeq ($(PRIMARY_GOAL),phpstan)
 phpstan: ## Run PHPStan.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) ./vendor/bin/phpstan analyse --memory-limit=512M $(CLI_ARGS)
+	$(DOCKER_RUN) $(SERVICE) ./vendor/bin/phpstan analyse --memory-limit=512M $(CLI_ARGS)
 endif
 
 ifeq ($(PRIMARY_GOAL),composer-dependency-analyser)
 composer-dependency-analyser: ## Run Composer Dependency Analyser.
-	$(DOCKER_COMPOSE_DEV) run --rm $(SERVICE) ./vendor/bin/composer-dependency-analyser --config=composer-dependency-analyser.php $(CLI_ARGS)
+	$(DOCKER_RUN) $(SERVICE) ./vendor/bin/composer-dependency-analyser --config=composer-dependency-analyser.php $(CLI_ARGS)
 endif
 
 #

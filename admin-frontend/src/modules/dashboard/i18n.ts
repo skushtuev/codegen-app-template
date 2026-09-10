@@ -7,10 +7,15 @@ export const i18n = {
             Menu: {
                 openMenu: 'Открыть меню',
                 closeMenu: 'Закрыть меню',
-                adminUsers: 'Пользователи',
+                adminUsers: 'Администраторы',
+                users: 'Пользователи',
                 mediaLibrary: 'Медиабиблиотека',
                 list: 'Список',
                 create: 'Создать',
+            },
+            Statuses: {
+                active: 'Активен',
+                banned: 'Забанен',
             },
             Table: {
                 empty: 'Данных пока нет',
@@ -44,6 +49,38 @@ export const i18n = {
                     confirmPasswordPlaceholder: 'Повторите новый пароль',
                     submit: 'Сохранить пароль',
                     successMessage: 'Пароль обновлён',
+                },
+            },
+            Users: {
+                List: {
+                    title: 'Пользователи приложения',
+                },
+                Table: {
+                    user: 'Пользователь',
+                    language: 'Язык',
+                    status: 'Статус',
+                    lastLogin: 'Последний вход',
+                    createdAt: 'Создан',
+                    never: 'Не входил',
+                    verified: 'Почта подтверждена',
+                    unverified: 'Почта не подтверждена',
+                    ban: 'Забанить',
+                    unban: 'Разбанить',
+                },
+                Ban: {
+                    banTitle: 'Бан пользователя',
+                    unbanTitle: 'Снятие бана',
+                    banMessage: 'Пользователь {email} больше не сможет войти.',
+                    unbanMessage: 'Вернуть пользователю {email} доступ?',
+                    reasonLabel: 'Причина',
+                    reasonPlaceholder: 'Например: спам',
+                    banConfirm: 'Забанить',
+                    unbanConfirm: 'Разбанить',
+                    cancel: 'Отмена',
+                    banSuccessTitle: 'Пользователь забанен',
+                    banSuccessMessage: 'Вход для этого пользователя закрыт',
+                    unbanSuccessTitle: 'Бан снят',
+                    unbanSuccessMessage: 'Пользователь снова может войти',
                 },
             },
             AdminUsers: {
@@ -84,10 +121,6 @@ export const i18n = {
                 Roles: {
                     admin: 'Админ',
                     editor: 'Редактор',
-                },
-                Statuses: {
-                    active: 'Активен',
-                    banned: 'Забанен',
                 },
                 PasswordModal: {
                     titleWithEmail: 'Смена пароля: {email}',
@@ -225,9 +258,14 @@ export const i18n = {
                 openMenu: 'Open menu',
                 closeMenu: 'Close menu',
                 adminUsers: 'Admin users',
+                users: 'Users',
                 mediaLibrary: 'Media library',
                 list: 'List',
                 create: 'Create',
+            },
+            Statuses: {
+                active: 'Active',
+                banned: 'Banned',
             },
             Table: {
                 empty: 'No data yet',
@@ -261,6 +299,38 @@ export const i18n = {
                     confirmPasswordPlaceholder: 'Repeat new password',
                     submit: 'Save password',
                     successMessage: 'Password updated',
+                },
+            },
+            Users: {
+                List: {
+                    title: 'Application users',
+                },
+                Table: {
+                    user: 'User',
+                    language: 'Language',
+                    status: 'Status',
+                    lastLogin: 'Last login',
+                    createdAt: 'Created',
+                    never: 'Never',
+                    verified: 'E-mail verified',
+                    unverified: 'E-mail not verified',
+                    ban: 'Ban',
+                    unban: 'Unban',
+                },
+                Ban: {
+                    banTitle: 'Ban user',
+                    unbanTitle: 'Unban user',
+                    banMessage: 'User {email} will no longer be able to log in.',
+                    unbanMessage: 'Give {email} access back?',
+                    reasonLabel: 'Reason',
+                    reasonPlaceholder: 'For example: spam',
+                    banConfirm: 'Ban',
+                    unbanConfirm: 'Unban',
+                    cancel: 'Cancel',
+                    banSuccessTitle: 'User banned',
+                    banSuccessMessage: 'This user can no longer log in',
+                    unbanSuccessTitle: 'Ban removed',
+                    unbanSuccessMessage: 'The user can log in again',
                 },
             },
             AdminUsers: {
@@ -301,10 +371,6 @@ export const i18n = {
                 Roles: {
                     admin: 'Admin',
                     editor: 'Editor',
-                },
-                Statuses: {
-                    active: 'Active',
-                    banned: 'Banned',
                 },
                 PasswordModal: {
                     titleWithEmail: 'Change password: {email}',

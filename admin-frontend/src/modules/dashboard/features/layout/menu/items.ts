@@ -1,4 +1,4 @@
-import { FolderTree, Images, UsersRound, type LucideIcon } from 'lucide-react'
+import { FolderTree, Images, UserRound, UsersRound, type LucideIcon } from 'lucide-react'
 import type { IAdminPermissions } from '@modules/auth'
 
 export type DashboardMenuSubItem = {
@@ -21,6 +21,12 @@ export const dashboardMenuItems: DashboardMenuItem[] = [
         label: 'adminUsers',
         link: '/admin-users',
         can: 'adminUsers',
+    },
+    {
+        icon: UserRound,
+        label: 'users',
+        link: '/users',
+        can: 'users',
     },
     {
         icon: Images,

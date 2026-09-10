@@ -6,18 +6,30 @@ declare(strict_types=1);
 return [
     'config-plugin' => [
         'params' => 'params.php',
-        'params-web' => [
-            '$params',
+        // `params-web` / `di-web` are the shared base: vendor packages register into them.
+        // Each HTTP app adds its own file on top and runs with its own group.
+        'params-web' => '$params',
+        'params-admin' => [
+            '$params-web',
             '../../admin-api/config/params.php',
+        ],
+        'params-internal' => [
+            '$params-web',
+            '../../internal-api/config/params.php',
         ],
         'params-console' => [
             '$params',
             '../../console/config/params.php',
         ],
         'di' => 'di.php',
-        'di-web' => [
-            '$di',
+        'di-web' => '$di',
+        'di-admin' => [
+            '$di-web',
             '../../admin-api/config/di.php',
+        ],
+        'di-internal' => [
+            '$di-web',
+            '../../internal-api/config/di.php',
         ],
         'di-console' => '$di',
         'di-delegates' => [],

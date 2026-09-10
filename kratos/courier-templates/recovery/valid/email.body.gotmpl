@@ -1,0 +1,18 @@
+{{- $lang := "en" -}}
+{{- if .Identity.traits.language -}}{{ $lang = .Identity.traits.language }}{{- end -}}
+{{- if .TransientPayload.lang -}}{{ $lang = .TransientPayload.lang }}{{- end -}}
+{{- if eq $lang "ru" -}}
+<p>Здравствуйте{{ if .Identity.traits.name }}, {{ .Identity.traits.name }}{{ end }}!</p>
+<p>Кто-то запросил восстановление доступа к вашему аккаунту.</p>
+<p><a href="{{ .RecoveryURL }}" style="display:inline-block;padding:12px 20px;background:#4c6ef5;color:#fff;text-decoration:none;border-radius:4px;">Задать новый пароль</a></p>
+<p>Или откройте ссылку вручную:<br><span style="word-break:break-all;">{{ .RecoveryURL }}</span></p>
+<p>Срок действия ссылки — {{ .ExpiresInMinutes }} мин.</p>
+<p>Если это были не вы, ничего делать не нужно. Пароль останется прежним.</p>
+{{- else -}}
+<p>Hello{{ if .Identity.traits.name }} {{ .Identity.traits.name }}{{ end }},</p>
+<p>someone asked to recover access to your account.</p>
+<p><a href="{{ .RecoveryURL }}" style="display:inline-block;padding:12px 20px;background:#4c6ef5;color:#fff;text-decoration:none;border-radius:4px;">Set a new password</a></p>
+<p>Or open this link manually:<br><span style="word-break:break-all;">{{ .RecoveryURL }}</span></p>
+<p>The link is valid for {{ .ExpiresInMinutes }} minutes.</p>
+<p>If this was not you, no action is needed. Your password stays the same.</p>
+{{- end -}}

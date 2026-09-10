@@ -1,0 +1,257 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ory/kratos/v26.2.0/embedx/config.schema.json
+# Ory Kratos — local development configuration.
+#
+# The secrets below are DEV PLACEHOLDERS, like the Postgres password in docker-compose.yml.
+# In production override them with environment variables instead of editing this file:
+#   DSN, SECRETS_COOKIE, SECRETS_CIPHER, COURIER_SMTP_CONNECTION_URI, SERVE_PUBLIC_BASE_URL.
+
+# Pin the config schema version so Kratos validates against the right one.
+version: v26.2.0
+
+dsn: postgres://user:password@postgres:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+
+serve:
+  public:
+    base_url: http://id.app.test/
+    cors:
+      # The browser talks to Kratos cross-origin (app.app.test:4511 -> id.app.test),
+      # so credentialed CORS is required for the session cookie to be set.
+      enabled: true
+      allowed_origins:
+        - http://app.app.test:4511
+        - http://localhost:4511
+      allowed_methods: [GET, POST, PUT, PATCH, DELETE]
+      allowed_headers: [Authorization, Cookie, Content-Type, X-Session-Token, X-CSRF-Token]
+      exposed_headers: [Content-Type, Set-Cookie]
+      allow_credentials: true
+  admin:
+    # Deliberately NOT published through traefik: the admin API has no authentication
+    # of its own, so reaching it means being able to create or delete any identity.
+    base_url: http://kratos:4434/
+
+cookies:
+  # Root domain, so the session cookie is shared with any future *.app.test API host.
+  domain: app.test
+  path: /
+  same_site: Lax
+
+session:
+  lifespan: 720h
+  cookie:
+    domain: app.test
+    persistent: true
+    same_site: Lax
+
+selfservice:
+  default_browser_return_url: http://app.app.test:4511/dashboard
+  allowed_return_urls:
+    - http://app.app.test:4511
+    - http://localhost:4511
+
+  methods:
+    password:
+      enabled: true
+      config:
+        min_password_length: 8
+        # Off in dev: the check calls haveibeenpwned.com on every registration.
+        haveibeenpwned_enabled: false
+        # On in prod
+        identifier_similarity_check_enabled: false
+    link:
+      enabled: true
+      config:
+        # One shared lifespan for BOTH verification and recovery links — the link method has
+        # no way to separate them. 1h is Ory's default: long enough to find the mail, short
+        # enough that a leaked recovery link goes stale quickly.
+        lifespan: 1h
+    code:
+      enabled: false
+    totp:
+      enabled: false
+
+  flows:
+    error:
+      ui_url: http://app.app.test:4511/error
+
+    login:
+      ui_url: http://app.app.test:4511/login
+      lifespan: 10m
+      after:
+        password:
+          # Method hooks replace `after.hooks`, so the web hook is repeated here.
+          hooks:
+            # Unverified users cannot log in. Runs first, so a blocked attempt never
+            # reaches the web hook and never stamps last_login_at.
+            - hook: require_verified_address
+            - hook: web_hook
+              config:
+                id: after-login
+                url: http://internal-api:8080/kratos/after-login
+                method: POST
+                body: file:///etc/config/kratos/hooks/identity.jsonnet
+                auth:
+                  type: api_key
+                  config:
+                    name: X-Kratos-Webhook-Key
+                    value: dev-only-kratos-webhook-key-change-me
+                    in: header
+                response:
+                  # Fire and forget: a slow or dead backend must never break a registration.
+                  ignore: true
+        # Fallback for methods with no block of their own, e.g. social sign-in later.
+        hooks:
+          # Mirrors the identity into our `users` table. Placed on `after.hooks`, not under a
+          # method, so it also runs for social sign-in later.
+          - hook: web_hook
+            config:
+              id: after-login
+              url: http://internal-api:8080/kratos/after-login
+              method: POST
+              body: file:///etc/config/kratos/hooks/identity.jsonnet
+              auth:
+                type: api_key
+                config:
+                  name: X-Kratos-Webhook-Key
+                  value: dev-only-kratos-webhook-key-change-me
+                  in: header
+              response:
+                # Fire and forget: a slow or dead backend must never break a registration.
+                ignore: true
+
+    registration:
+      ui_url: http://app.app.test:4511/register
+      lifespan: 10m
+      after:
+        hooks:
+          # Mirrors the identity into our `users` table. Placed on `after.hooks`, not under a
+          # method, so it also runs for social sign-in later.
+          - hook: web_hook
+            config:
+              id: kratos-sync
+              url: http://internal-api:8080/kratos/sync
+              method: POST
+              body: file:///etc/config/kratos/hooks/identity.jsonnet
+              auth:
+                type: api_key
+                config:
+                  name: X-Kratos-Webhook-Key
+                  value: dev-only-kratos-webhook-key-change-me
+                  in: header
+              response:
+                # Fire and forget: a slow or dead backend must never break a registration.
+                ignore: true
+        password:
+          # Method hooks replace `after.hooks`, so the web hook is repeated here.
+          hooks:
+            # No `session` hook on purpose: a new user is NOT logged in automatically.
+            # They confirm their e-mail, then log in themselves.
+            - hook: show_verification_ui
+            - hook: web_hook
+              config:
+                id: kratos-sync
+                url: http://internal-api:8080/kratos/sync
+                method: POST
+                body: file:///etc/config/kratos/hooks/identity.jsonnet
+                auth:
+                  type: api_key
+                  config:
+                    name: X-Kratos-Webhook-Key
+                    value: dev-only-kratos-webhook-key-change-me
+                    in: header
+                response:
+                  ignore: true
+
+    verification:
+      enabled: true
+      ui_url: http://app.app.test:4511/verify
+      use: link
+      # Must not be shorter than methods.link.config.lifespan, or the link dies before the
+      # token does and the user gets "flow expired" from a link that looks still valid.
+      lifespan: 1h
+      after:
+        default_browser_return_url: http://app.app.test:4511/dashboard
+        hooks:
+          # Mirrors the identity into our `users` table. Placed on `after.hooks`, not under a
+          # method, so it also runs for social sign-in later.
+          - hook: web_hook
+            config:
+              id: kratos-sync
+              url: http://internal-api:8080/kratos/sync
+              method: POST
+              body: file:///etc/config/kratos/hooks/identity.jsonnet
+              auth:
+                type: api_key
+                config:
+                  name: X-Kratos-Webhook-Key
+                  value: dev-only-kratos-webhook-key-change-me
+                  in: header
+              response:
+                # Fire and forget: a slow or dead backend must never break a registration.
+                ignore: true
+
+    recovery:
+      enabled: true
+      ui_url: http://app.app.test:4511/recovery
+      use: link
+      lifespan: 1h
+
+    settings:
+      ui_url: http://app.app.test:4511/settings
+      privileged_session_max_age: 15m
+      required_aal: highest_available
+      after:
+        hooks:
+          # Mirrors the identity into our `users` table. Placed on `after.hooks`, not under a
+          # method, so it also runs for social sign-in later.
+          - hook: web_hook
+            config:
+              id: kratos-sync
+              url: http://internal-api:8080/kratos/sync
+              method: POST
+              body: file:///etc/config/kratos/hooks/identity.jsonnet
+              auth:
+                type: api_key
+                config:
+                  name: X-Kratos-Webhook-Key
+                  value: dev-only-kratos-webhook-key-change-me
+                  in: header
+              response:
+                # Fire and forget: a slow or dead backend must never break a registration.
+                ignore: true
+
+    logout:
+      after:
+        default_browser_return_url: http://app.app.test:4511/
+
+identity:
+  default_schema_id: user
+  schemas:
+    - id: user
+      url: file:///etc/config/kratos/identity/user.schema.json
+
+courier:
+  smtp:
+    # Dev default: Mailpit, a local mail catcher. It never delivers to a real inbox, which is
+    # exactly what you want while testing with addresses like test@example.com.
+    #
+    # Staging and production override this with the environment variable
+    # COURIER_SMTP_CONNECTION_URI, so no real SMTP credentials ever live in this repo:
+    #   Brevo    COURIER_SMTP_CONNECTION_URI=smtp://<login>:<smtp-key>@smtp-relay.brevo.com:587
+    #   Mailgun  COURIER_SMTP_CONNECTION_URI=smtps://postmaster@mg.example.com:<pass>@smtp.mailgun.org:465
+    connection_uri: smtp://mailpit:1025/?disable_starttls=true
+    from_address: no-reply@app.test
+    from_name: App
+  template_override_path: /etc/config/kratos/courier-templates
+
+secrets:
+  cookie:
+    - dev-only-kratos-cookie-secret-change-me
+  cipher:
+    # Must be exactly 32 characters.
+    - 0123456789abcdef0123456789abcdef
+
+log:
+  level: debug
+  format: text
+  # Dev only — prints codes and tokens into the container log.
+  leak_sensitive_values: true

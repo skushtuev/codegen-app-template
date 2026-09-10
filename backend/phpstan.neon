@@ -3,6 +3,8 @@ parameters:
     paths:
         - admin-api/src
         - admin-api/web/index.php
+        - internal-api/src
+        - internal-api/web/index.php
         - common/src
         - console/src
         - yii

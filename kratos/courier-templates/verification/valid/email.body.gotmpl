@@ -1,0 +1,18 @@
+{{- $lang := "en" -}}
+{{- if .Identity.traits.language -}}{{ $lang = .Identity.traits.language }}{{- end -}}
+{{- if .TransientPayload.lang -}}{{ $lang = .TransientPayload.lang }}{{- end -}}
+{{- if eq $lang "ru" -}}
+<p>Здравствуйте{{ if .Identity.traits.name }}, {{ .Identity.traits.name }}{{ end }}!</p>
+<p>Подтвердите ваш адрес электронной почты:</p>
+<p><a href="{{ .VerificationURL }}" style="display:inline-block;padding:12px 20px;background:#4c6ef5;color:#fff;text-decoration:none;border-radius:4px;">Подтвердить адрес</a></p>
+<p>Или откройте ссылку вручную:<br><span style="word-break:break-all;">{{ .VerificationURL }}</span></p>
+<p>Срок действия ссылки — {{ .ExpiresInMinutes }} мин.</p>
+<p>Если вы не создавали аккаунт, просто удалите это письмо.</p>
+{{- else -}}
+<p>Hello{{ if .Identity.traits.name }} {{ .Identity.traits.name }}{{ end }},</p>
+<p>please confirm your e-mail address:</p>
+<p><a href="{{ .VerificationURL }}" style="display:inline-block;padding:12px 20px;background:#4c6ef5;color:#fff;text-decoration:none;border-radius:4px;">Confirm my e-mail</a></p>
+<p>Or open this link manually:<br><span style="word-break:break-all;">{{ .VerificationURL }}</span></p>
+<p>The link is valid for {{ .ExpiresInMinutes }} minutes.</p>
+<p>If you did not create an account, you can ignore this e-mail.</p>
+{{- end -}}
