@@ -17,6 +17,9 @@ return [
             'yiisoft/assets' => [
                 'config/di.php',
             ],
+            'yiisoft/log-target-file' => [
+                'config/di.php',
+            ],
             'yiisoft/router-fastroute' => [
                 'config/di.php',
             ],
@@ -56,6 +59,9 @@ return [
                 'config/params.php',
             ],
             'yiisoft/db-migration' => [
+                'config/params.php',
+            ],
+            'yiisoft/log-target-file' => [
                 'config/params.php',
             ],
             'yiisoft/router-fastroute' => [
@@ -158,9 +164,6 @@ return [
             ],
         ],
         'events-web' => [
-            'yiisoft/log' => [
-                'config/events-web.php',
-            ],
             'yiisoft/yii-view-renderer' => [
                 'config/events-web.php',
             ],
@@ -168,6 +171,9 @@ return [
                 'config/events-web.php',
             ],
             'yiisoft/request-provider' => [
+                'config/events-web.php',
+            ],
+            'yiisoft/log' => [
                 'config/events-web.php',
             ],
             '/' => [

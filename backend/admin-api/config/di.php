@@ -24,6 +24,7 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\DataResponse\ResponseFactory\JsonResponseFactory;
 use Yiisoft\DataResponse\ResponseFactory\DataResponseFactoryInterface;
@@ -142,6 +143,25 @@ return [
         ResponseFactoryInterface $responseFactory,
         Injector $injector
     ) {
+        // Every 500 passes through here. ExceptionResponder sits inside ErrorCatcher, so it catches the
+        // exception first and ErrorCatcher never logs it: without this the cause of a 500 is lost and only
+        // the access log's status code survives.
+        $logAndFail = static function (
+            \Throwable $exception,
+            ResponseFactoryInterface $responseFactory,
+            LoggerInterface $logger,
+        ): ResponseInterface {
+            // No stack trace on purpose: PHP puts call arguments in it, so a trace can carry passwords or
+            // ADMIN_AUTH_JWT_SECRET. AbstractService::handleExceptionForApi() strips them for the same reason.
+            $logger->error($exception->getMessage(), [
+                'exception' => $exception::class,
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+            ]);
+
+            return $responseFactory->createResponse(500);
+        };
+
         $exceptionMap = [
             InputValidationException::class => static function (
                 InputValidationException $exception,
@@ -189,8 +209,8 @@ return [
             NotAuthorizedException::class => 401,
             ForbiddenException::class => 403,
             NotFoundException::class => 404,
-            InternalException::class => 500,
-            \Throwable::class => 500,
+            InternalException::class => $logAndFail,
+            \Throwable::class => $logAndFail,
         ];
 
         return new ExceptionResponder($exceptionMap, $responseFactory, $injector);
